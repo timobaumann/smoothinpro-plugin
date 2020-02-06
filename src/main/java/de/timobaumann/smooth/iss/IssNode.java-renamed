@@ -1,0 +1,17 @@
+package de.timobaumann.smooth.iss;
+
+import com.clt.diamant.*;
+import com.clt.diamant.graph.Graph;
+import com.clt.diamant.graph.Node;
+import com.clt.diamant.graph.nodes.NodeExecutionException;
+import com.clt.diamant.gui.NodePropertiesDialog;
+
+/** this type of node takes an SQL expression and puts the result */
+public class IssNode extends AbstractOutputNode {
+
+    public IssNode() {
+        this.addEdge(); // have one port for an outgoing edge
+    }
+
+
+}

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wizard SYSTEM "Wizard.dtd">
+
+<wizard>
+	<plugin type="de.timobaumann.smooth.iss">
+	</plugin>
+	<graph directed="1" Graphic="1" Layout="points">
+		<att name="width" type="integer" value="756"/>
+		<att name="height" type="integer" value="546"/>
+		<groovyFunctions></groovyFunctions>
+		<variable uid="c3105db6-f4b4-42c5-a93b-8cfe8fd5081d">
+			<name>i</name>
+			<type>int</type>
+			<value>undefined</value>
+		</variable>
+		<node uid="0570394c-fb93-462f-be2e-1030f141b947" class="com.clt.diamant.graph.nodes.ScriptNode">
+			<graphics x="366" y="115" fill="#99ffff"/>
+			<att name="title" type="string" value="Script"/>
+			<att name="script" type="text">
+				<value>say_chunk(&quot;nimm bitte das Kreuz und lege es&quot;);
+i = say_chunk(&quot;nach oben&quot;);
+</value>
+			</att>
+		</node>
+		<node uid="0ef6d629-61f0-43f2-8143-668a9391e865" class="com.clt.diamant.graph.nodes.ConditionalNode">
+			<graphics x="359" y="186" fill="#c0c0c0"/>
+			<att name="title" type="string" value="Bedingung"/>
+			<att name="expression" type="string" value="random(0,1)==1"/>
+		</node>
+		<node uid="239b6315-631b-4ab3-8d0e-bccf4bf68806" class="com.clt.diamant.graph.nodes.EndNode">
+			<graphics x="376" y="439" fill="#9999ff"/>
+			<att name="title" type="string" value="Ende"/>
+		</node>
+		<node uid="2c341143-00a5-4905-8a5c-18d36a3eb938" class="com.clt.diamant.graph.nodes.ScriptNode">
+			<graphics x="290" y="261" fill="#99ffff"/>
+			<att name="title" type="string" value="Script"/>
+			<att name="script" type="text">
+				<value>revoke_chunk(i);
+say_chunk(&quot;nach links.&quot;);</value>
+			</att>
+		</node>
+		<node uid="37161d87-1f54-42d7-98e6-07d481ed574e" class="com.clt.diamant.graph.nodes.ScriptNode">
+			<graphics x="434" y="252" fill="#99ffff"/>
+			<att name="title" type="string" value="Script"/>
+			<att name="script" type="text">
+				<value>revoke_chunk(i);
+say_chunk(&quot;nach rechts.&quot;);</value>
+			</att>
+		</node>
+		<node uid="4d5adc10-417b-44ca-95df-6e7ed17d3a3c" class="com.clt.diamant.graph.nodes.StartNode">
+			<graphics x="366" y="40" fill="#9999ff"/>
+			<att name="title" type="string" value="Start"/>
+		</node>
+		<node uid="b4b4cbcf-d2d9-4b6f-8e39-535148774743" class="com.clt.diamant.graph.nodes.SleepNode">
+			<graphics x="376" y="366" fill="#99ffff"/>
+			<att name="title" type="string" value="Warten"/>
+			<att name="time" type="string" value="6000"/>
+		</node>
+		<edge src="0570394c-fb93-462f-be2e-1030f141b947" tgt="0ef6d629-61f0-43f2-8143-668a9391e865">
+		</edge>
+		<edge src="0ef6d629-61f0-43f2-8143-668a9391e865" tgt="2c341143-00a5-4905-8a5c-18d36a3eb938">
+			<att name="condition" type="string" value="random(0,1)==1"/>
+		</edge>
+		<edge src="0ef6d629-61f0-43f2-8143-668a9391e865" tgt="37161d87-1f54-42d7-98e6-07d481ed574e">
+			<att name="condition" type="string" value="else"/>
+		</edge>
+		<edge src="2c341143-00a5-4905-8a5c-18d36a3eb938" tgt="b4b4cbcf-d2d9-4b6f-8e39-535148774743">
+		</edge>
+		<edge src="37161d87-1f54-42d7-98e6-07d481ed574e" tgt="b4b4cbcf-d2d9-4b6f-8e39-535148774743">
+		</edge>
+		<edge src="4d5adc10-417b-44ca-95df-6e7ed17d3a3c" tgt="0570394c-fb93-462f-be2e-1030f141b947">
+		</edge>
+		<edge src="b4b4cbcf-d2d9-4b6f-8e39-535148774743" tgt="239b6315-631b-4ab3-8d0e-bccf4bf68806">
+		</edge>
+	</graph>
+</wizard>
