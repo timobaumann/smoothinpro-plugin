@@ -16,15 +16,17 @@ import inpro.audio.DispatchStream;
 import inpro.incremental.processor.AdaptableSynthesisModule;
 import inpro.incremental.source.IUSourceModule;
 import inpro.incremental.unit.*;
-import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.LoudnessPostProcessor;
 import inpro.synthesis.hts.VocodingAudioStream;
-import inpro.synthesis.hts.VocodingFramePostProcessor;
+import org.ros.namespace.GraphName;
+import org.ros.node.*;
+import org.ros.node.topic.Subscriber;
 import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import java.awt.*;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -129,6 +131,10 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
 
         private StressProcessor sp;
 
+        private NodeMainExecutor nodeMainExecutor;
+
+        private NodeMain nodeMain;
+
         public IssPluginRuntime() {
             Plugin.runtime = this;
 
@@ -139,15 +145,33 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
 
             sp = new StressProcessor(asm);
 
+            NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(
+                    getenv("ROS_IP", "127.0.0.1"),
+                    URI.create(getenv("ROS_MASTER_URI", "http://127.0.0.1:11311"))
+            );
+            nodeMain = new ROSNode(sp);
+            nodeMainExecutor = DefaultNodeMainExecutor.newDefault();
+            nodeMainExecutor.execute(nodeMain, nodeConfiguration);
+
             // TODO: really set a frame post processor and connect it to ROS
             asm.setFramePostProcessor(null);
             textInputModule.addListener(asm);
 
         }
 
+        private String getenv(String name, String defaultValue) {
+            String value = System.getenv(name);
+            if (value == null || value.isEmpty()) {
+                value = defaultValue;
+                System.err.print("[WARN]: using default for " + name);
+            }
+            return value;
+        }
+
         @Override
         public void dispose() {
             dispatcher.shutdown();
+            nodeMainExecutor.shutdownNodeMain(nodeMain);
         }
     }
 
@@ -169,6 +193,33 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
             VocodingAudioStream.gain = Math.exp(3* (v * .01) * Math.log(2));
         }
 
+    }
+
+    private class ROSNode implements NodeMain {
+
+        StressProcessor sp;
+
+        public ROSNode(StressProcessor sp) {
+            this.sp = sp;
+        }
+
+        @Override
+        public GraphName getDefaultNodeName() {
+            return GraphName.of("DialogOS_StressNode");
+        }
+
+        @Override
+        public void onStart(final ConnectedNode connectedNode) {
+            final Subscriber<std_msgs.Int32> subscriber = connectedNode.newSubscriber("DialogOS_stress", std_msgs.Int32._TYPE);
+            subscriber.addMessageListener(message -> {
+                int cmd = message.getData();
+                sp.setStress(cmd);
+            });
+        }
+
+        @Override public void onShutdown(Node node) { }
+        @Override public void onShutdownComplete(Node node) { }
+        @Override public void onError(Node node, Throwable throwable) { }
     }
 
     private static class TextInputModule extends IUSourceModule {
