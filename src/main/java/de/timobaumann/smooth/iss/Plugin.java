@@ -15,10 +15,11 @@ import com.clt.xml.XMLWriter;
 import inpro.audio.DispatchStream;
 import inpro.incremental.processor.AdaptableSynthesisModule;
 import inpro.incremental.source.IUSourceModule;
-import inpro.incremental.unit.ChunkIU;
-import inpro.incremental.unit.EditMessage;
-import inpro.incremental.unit.EditType;
-import inpro.incremental.unit.IU;
+import inpro.incremental.unit.*;
+import inpro.synthesis.hts.FullPFeatureFrame;
+import inpro.synthesis.hts.LoudnessPostProcessor;
+import inpro.synthesis.hts.VocodingAudioStream;
+import inpro.synthesis.hts.VocodingFramePostProcessor;
 import org.xml.sax.SAXException;
 
 import javax.swing.*;
@@ -50,8 +51,7 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
     public List<ExecutableFunctionDescriptor> registerScriptFunctions() {
         return Arrays.asList(
                 new ExecutableFunctionDescriptor("say_chunk", Type.Int, new Type[]{Type.Any}) {
-                    @Override
-                    public Value eval(Value[] args) {
+                    @Override public Value eval(Value[] args) {
                         assert args.length == 1;
                         assert args[0].getType() == Type.String;
                         String text = ((StringValue) args[0]).getString();
@@ -60,11 +60,18 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
                     }
                 },
                 new ExecutableFunctionDescriptor("revoke_chunk", Type.Bool, new Type[]{Type.Any}) {
-                    @Override
-                    public Value eval(Value[] args) {
+                    @Override public Value eval(Value[] args) {
                         assert args.length == 1;
                         assert args[0].getType() == Type.Int;
                         return new BoolValue(runtime.textInputModule.revokeChunk(((IntValue) args[0]).getInt()));
+                    }
+                },
+                new ExecutableFunctionDescriptor("change_stress", Type.Void, new Type[]{Type.Any}) {
+                    @Override public Value eval(Value[] args) {
+                        assert args.length == 1;
+                        assert args[0].getType() == Type.Int;
+                        runtime.sp.setStress((int) ((IntValue) args[0]).getInt());
+                        return Value.Void;
                     }
                 }
         );
@@ -120,6 +127,8 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
 
         private DispatchStream dispatcher;
 
+        private StressProcessor sp;
+
         public IssPluginRuntime() {
             Plugin.runtime = this;
 
@@ -127,6 +136,9 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
 
             textInputModule = new TextInputModule();
             AdaptableSynthesisModule asm = new AdaptableSynthesisModule(dispatcher);
+
+            sp = new StressProcessor(asm);
+
             // TODO: really set a frame post processor and connect it to ROS
             asm.setFramePostProcessor(null);
             textInputModule.addListener(asm);
@@ -137,6 +149,26 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
         public void dispose() {
             dispatcher.shutdown();
         }
+    }
+
+    private class StressProcessor {
+        LoudnessPostProcessor vfpp = new LoudnessPostProcessor();
+        AdaptableSynthesisModule asm;
+
+        public StressProcessor(AdaptableSynthesisModule asm) {
+            this.asm = asm;
+            asm.setFramePostProcessor(vfpp);
+        }
+
+
+        public void setStress(int v) { // should be in the range -100 .. +100
+            vfpp.setLoudness(v);
+            double factor = Math.exp(v * .01 * Math.log(2)); // convert to [.5;2]
+            asm.scaleTempo(factor);
+            asm.shiftPitch(v * 3); // a maximum of 6 semitones?
+            VocodingAudioStream.gain = Math.exp(3* (v * .01) * Math.log(2));
+        }
+
     }
 
     private static class TextInputModule extends IUSourceModule {

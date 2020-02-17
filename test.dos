@@ -5,8 +5,8 @@
 	<plugin type="de.timobaumann.smooth.iss">
 	</plugin>
 	<graph directed="1" Graphic="1" Layout="points">
-		<att name="width" type="integer" value="758"/>
-		<att name="height" type="integer" value="548"/>
+		<att name="width" type="integer" value="760"/>
+		<att name="height" type="integer" value="550"/>
 		<groovyFunctions></groovyFunctions>
 		<variable uid="c3105db6-f4b4-42c5-a93b-8cfe8fd5081d">
 			<name>i</name>
@@ -19,7 +19,7 @@
 			<att name="script" type="text">
 				<value>say_chunk(&quot;nimm bitte das Kreuz und lege es&quot;);
 i = say_chunk(&quot;nach oben&quot;);
-</value>
+change_stress(50);</value>
 			</att>
 		</node>
 		<node uid="0ef6d629-61f0-43f2-8143-668a9391e865" class="com.clt.diamant.graph.nodes.ConditionalNode">
