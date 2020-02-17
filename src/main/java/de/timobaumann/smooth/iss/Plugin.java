@@ -33,7 +33,7 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
 
     @Override
     public void initialize() {
-        System.setProperty("inpro.tts.language", "de");
+/*        System.setProperty("inpro.tts.language", "de");
         System.setProperty("mary.voice", "bits1-hsmm");
         System.setProperty("inpro.tts.voice", "bits1-hsmm"); /* */
 /*        System.setProperty("inpro.tts.language", "en_US");

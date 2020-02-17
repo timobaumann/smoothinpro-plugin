@@ -6,6 +6,9 @@ plugins {
 repositories {
   mavenCentral()
   jcenter()
+  maven {
+    url "http://github.com/rosjava/rosjava_mvn_repo/raw/master"
+  }
   maven { url "https://jitpack.io" }
 }
 dependencies {
@@ -17,7 +20,12 @@ dependencies {
   implementation(group:'com.github.dialogos-project', name:'dialogos', version:'-SNAPSHOT') {
     exclude module: 'DialogOS_SphinxPlugin'
   }
+
+  compile 'org.ros.rosjava_core:rosjava:[0.3,0.4)'
+  
 }
 
-mainClassName = 'com.clt.dialogos.DialogOS'
-
+application {
+    mainClassName = 'com.clt.dialogos.DialogOS'
+    applicationDefaultJvmArgs = ['-Dinpro.tts.language=en_US', '-Dmary.voice=cmu-slt-hsmm', '-Dinpro.tts.voice=cmu-slt-hsmm']
+}
