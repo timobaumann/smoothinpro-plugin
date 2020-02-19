@@ -16,10 +16,14 @@ dependencies {
     exclude module: 'inprotk.demo'
   }
   runtime group: 'de.dfki.mary', name: 'voice-cmu-slt-hsmm', version: '5.2'
-  runtime group:'com.github.dialogos-project', name:'dialogos-plugin-ros', version:'-SNAPSHOT'
-  runtime group:'com.github.dialogos-project', name:'dialogos-ros', version: '-SNAPSHOT'
+  runtime(group:'com.github.dialogos-project', name:'dialogos-plugin-ros', version:'master-SNAPSHOT') {
+    exclude group: 'com.github.dialogos-project'
+  }
+  runtime(group:'com.github.dialogos-project', name:'dialogos-ros', version: 'master-SNAPSHOT') {
+    exclude group: 'com.github.dialogos-project'
+  }
 
-  implementation(group:'com.github.dialogos-project', name:'dialogos', version:'-SNAPSHOT') {
+  implementation(group:'com.github.dialogos-project', name:'dialogos', version:'master-SNAPSHOT') {
     exclude module: 'DialogOS_SphinxPlugin'
   }
 
