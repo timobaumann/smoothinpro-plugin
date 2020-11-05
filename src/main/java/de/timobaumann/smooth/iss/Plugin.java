@@ -190,7 +190,7 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
             double factor = Math.exp(v * .01 * Math.log(2)); // convert to [.5;2]
             asm.scaleTempo(factor);
             asm.shiftPitch(v * 3); // a maximum of 6 semitones?
-            VocodingAudioStream.gain = Math.exp(3* (v * .01) * Math.log(2));
+            VocodingAudioStream.gain = Math.exp(.3* (v * .01) * Math.log(2));
         }
 
     }
